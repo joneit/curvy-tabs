@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CurvyTabs Demo</title>
+  <script src="build/curvy-tabs.js"></script>
+  <style>
+    body { font-family: sans-serif }
+    h1 { color: #aaa }
+    td { font-family: monospace }
+    td:nth-child(2) { text-align: center; padding: 0 2em }
+    td:nth-child(3) { text-align: center; }
+  </style>
+</head>
+<body>
+
+<h1>CurvyTabs 1.0.0 Demo</h1>
+
+<div class="curvy-tabs-container" style="height:100px">
+  <div class="curvy-tabs-content" style="background-color:#dff" name="Forescore"><u>Forescore</u> and seven years ago ...</div>
+  <div class="curvy-tabs-content" style="background-color:#fdf" name="and">Forescore <u>and</u> seven years ago ...</div>
+  <div class="curvy-tabs-content" style="background-color:#ffd" name="seven">Forescore and <u>seven</u> years ago ...</div>
+  <div class="curvy-tabs-content" style="background-color:#fdd" name="years">Forescore and seven <u>years</u> ago ...</div>
+  <div class="curvy-tabs-content" style="background-color:#ddf" name="ago">Forescore and seven years <u>ago</u> ...</div>
+  <div class="curvy-tabs-content" style="background-color:#dfd" name="...">Forescore and seven years ago <u>...</u></div>
+</div>
+
+<table><tr>
+  <th>Property</th>
+  <th>Default</th>
+  <th colspan="2">&nbsp;</th>
+</tr><tr>
+  <td>tabBar.curviness</td>
+  <td>1.0</td>
+  <td>
+    <input type="range" min="0" max="1" step=".1" value="1" oninput="tabBar.curviness=this.value;this.parentElement.nextElementSibling.innerText=Number(this.value).toFixed(1)">
+  </td>
+  <td>1.0</td>
+  </td>
+</tr><tr>
+  <td>tabBar.minWidth</td>
+  <td>0</td>
+  <td>
+    <input type="range" min="0" max="200" step="1" value="0" oninput="tabBar.minWidth=this.value;this.parentElement.nextElementSibling.innerText=this.value">
+  </td>
+  <td>0</td>
+  </td>
+</tr><tr>
+  <td>tabBar.height</td>
+  <td>29</td>
+  <td>
+    <input type="range" min="10" max="100" step="1" value="29" oninput="tabBar.height=this.value;this.parentElement.nextElementSibling.innerText=this.value">
+  </td>
+  <td>29</td>
+  </td>
+</tr><tr>
+  <td>tabBar.containerHeight</td>
+  <td>100</td>
+  <td>
+    <input type="range" min="20" max="500" step="1" value="100" oninput="tabBar.containerHeight=this.value;this.parentElement.nextElementSibling.innerText=this.value">
+  </td>
+  <td>100</td>
+  </td>
+</tr><tr>
+  <td>containter.style.borderColor</td>
+  <td>#aaaaaa</td>
+  <td>
+    <input type="color" value="#aaaaaa" oninput="tabBar.container.style.borderColor=this.value;this.parentElement.nextElementSibling.innerText=this.value;tabBar.paint()">
+  </td>
+  <td>#aaaaaa</td>
+</tr></table>
+
+<script>
+var tabBar = new CurvyTabs(document.querySelector('.curvy-tabs-container'));
+tabBar.paint();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,5 @@
+/.idea
+/[0-1]*
+/build
+/*.sh
+/*.html

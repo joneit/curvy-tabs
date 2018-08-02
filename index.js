@@ -4,85 +4,96 @@
 'use strict';
 
 var stylesheet =
-        '.curvy-tabs-container {' +
-        'position: absolute;' +
-        'z-index: 0;' +
+    '.curvy-tabs-container {' +
+        'position: relative;' +
+        // 'z-index: 0;' +
         'width: 500px;' +
         'height: 500px;' +
+    '}\n' +
+    '.curvy-tabs-container > div {' +
+        'position: absolute;' +
+        'left: 0;' +
+        'bottom: 0;' +
+        'right: 0;' +
         'border: 1px solid #aaa;' +
         'border-radius: 7px;' +
     '}\n' +
-    '.curvy-tabs-bar {' +
-        'position: relative;' +
-        'z-index: 1;' +
-    '}\n' +
-    '.curvy-tabs-content {' +
-        'visibility: hidden;' +
+    '.curvy-tabs-container > div > * {' +
         'position: absolute;' +
+        'display: block;' +
+        'visibility: hidden;' +
         'padding: 8px;' +
         'top: 0;' +
         'bottom: 0;' +
         'left: 0;' +
         'right: 0;' +
-        'overflow: scroll;border-radius:7px' +
+        'overflow: scroll;' +
+        'border-radius: 7px;' +
+    '}\n' +
+    '.curvy-tabs-container > canvas {' +
+        'position: absolute;' +
     '}\n';
 
 var GAP = 4, PADDING = 4;
 
+var TRANSPARENT = 'rgba(0, 0, 0, 0)';
+
 function CurvyTabs(container, selectedContentElement) {
-    if (!document.head.querySelector('style#injected-stylesheet-curvy-tabs')) {
-        var el = document.createElement('style');
-        el.id = 'injected-stylesheet-curvy-tabs';
-        el.innerHTML = stylesheet;
-        document.head.insertBefore(el, document.head.firstElementChild);
-    }
+    injectStylesheet();
+
+    var children = Array.prototype.slice.call(container.children);
 
     this.container = container;
     this._minWidth = 0;
     this._curviness = 1;
     this._font = '10pt sans-serif';
-    this._selected = selectedContentElement || container.querySelector('.curvy-tabs-content');
+    this._selected = selectedContentElement || children[0];
+
+    var contents = this.contents = document.createElement('div');
+    children.forEach(function(child) {
+        contents.appendChild(child);
+    });
+    container.appendChild(contents);
 
     var tabs = this.tabs = new WeakMap;
-    getContentsArray.call(this).forEach(function(content) {
+    this.contentDivs.forEach(function(content) {
         tabs.set(content, {});
     });
 
     setContentsBorderRadius.call(this);
 
-    var canvas = this.canvas = document.createElement('canvas');
     var containerRect = container.getBoundingClientRect();
-    document.body.insertBefore(canvas, container);
-    canvas.style.left = containerRect.left - canvas.getBoundingClientRect().left + 'px';
-    canvas.classList.add('curvy-tabs-bar');
+    var canvas = this.canvas = document.createElement('canvas');
+    container.appendChild(canvas);
     canvas.width = containerRect.width;
-    this.containerHeight = this.containerHeight; // sets canvas bottom margin
-    this.height = CurvyTabs.height; // invokes paint()
+    this.size = CurvyTabs.size;
+    this.height = this.height; // invoke setter to calculate and set content height; invokes paint()
 
     this.canvas.addEventListener('click', clickHandler.bind(this));
 }
 
-CurvyTabs.height = 29;
+CurvyTabs.size = 29;
 
 CurvyTabs.prototype = {
     constructor: CurvyTabs,
 
-    destruct: function() {
-        this.canvas.remove();
-        this.container.style.position = 'static';
-    },
-
     addTab: function(name, html, color) {
         var content = document.createElement('div');
-        content.name = name;
-        content.className = 'curvy-tabs-content';
+        content.setAttribute('name', name);
+        if (html) {
+            content.innerHTML = html;
+        }
         if (color) {
             content.style.backgroundColor = color;
         }
-        content.innerHTML = html;
         this.tabs.set(content, {});
-        this.container.appendChild(content);
+        this.contents.appendChild(content);
+        this.selected = content;
         this.paint();
+    },
+
+    get contentDivs() {
+        return Array.prototype.slice.call(this.contents.children);
     },
 
     get minWidth() {
@@ -102,22 +113,21 @@ CurvyTabs.prototype = {
         tabBar.paint();
     },
 
-    get height() {
-        return this.height;
+    get size() {
+        return this.canvas.height;
     },
-    set height(height) {
-        this.canvas.height = height;
-        this.container.style.top = window.scrollY + this.canvas.getBoundingClientRect().bottom - 1 + 'px';
+    set size(size) {
+        this.canvas.height = size;
+        this.contents.style.top = size - 1 + 'px';
         this.paint();
     },
 
-    get containerHeight() {
+    get height() {
         return this.container.getBoundingClientRect().height;
     },
-    set containerHeight(height) {
-        var style = window.getComputedStyle(this.container);
+    set height(height) {
         this.container.style.height = height + 'px';
-        this.canvas.style.marginBottom = parseInt(style.height) + parseInt(style.marginBottom) + 'px';
+        this.contents.style.top = this.size - borderWidth.call(this) + 'px';
         this.paint();
     },
 
@@ -127,7 +137,7 @@ CurvyTabs.prototype = {
     set curviness(curviness) {
         this._curviness = curviness;
         this.paint();
-        this.container.style.borderRadius = curviness * 7 + 'px';
+        this.contents.style.borderRadius = curviness * 7 + 'px';
         setContentsBorderRadius.call(this);
     },
 
@@ -139,14 +149,6 @@ CurvyTabs.prototype = {
         this.paint();
     },
 
-    get borderColor() {
-        return window.getComputedStyle(this.container).borderTopColor;
-    },
-    set borderColor(color) {
-        tabBar.container.style.borderColor = color;
-        tabBar.paint();
-    },
-
     get selected() {
         return this._selected;
     },
@@ -155,20 +157,31 @@ CurvyTabs.prototype = {
         this.paint();
     },
 
+    css: function(keyOrObject, value) {
+        css.call(this, this.contents, keyOrObject, value);
+        this.height = this.height; // invoke setter to reset overlap per possible border width change; invokes paint()
+    },
+
+    contentCss: function(keyOrObject, value) {
+        this.contentDivs.forEach(function(content) {
+            css.call(this, content, keyOrObject, value);
+        });
+    },
+
     paint: function() {
         var x = 8;
 
         this.gc = this.canvas.getContext('2d');
         this.gc.textAlign = 'center';
-        this.gc.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.gc.clearRect(0, 0, this.canvas.width, this.size);
         this.gc.font = this.font;
 
-        var contents = getContentsArray.call(this);
+        var contents = this.contentDivs;
         if (contents.length) {
             contents.forEach(function(content) {
                 var props = this.tabs.get(content);
                 x += props.width = drawTab.call(this, content, props.left = x);
-                x -= (0.80 - this.curviness * 0.11) * this.canvas.height; // overlap tabs
+                x -= (0.80 - this.curviness * 0.11) * this.size; // overlap tabs
             }, this);
             drawTab.call(this, this.selected, this.tabs.get(this.selected).left, true);
             selectDiv.call(this);
@@ -176,47 +189,91 @@ CurvyTabs.prototype = {
     }
 };
 
-function getContentsArray() {
-    return Array.prototype.slice.call(this.container.querySelectorAll('.curvy-tabs-content'));
+function css(el, keyOrObject, value) {
+    var style = el.style;
+    if (typeof keyOrObject === 'object' && !Array.isArray(keyOrObject)) {
+        Object.keys(keyOrObject).forEach(function(key) {
+            style[key] = keyOrObject[key];
+        })
+    } else if (arguments.length === 3) {
+        style[keyOrObject] = value;
+    } else if (arguments.length === 2) {
+        if (Array.isArray(keyOrObject)) {
+            return keyOrObject.reduce(function(dict, key) {
+                dict[key] = style[key];
+                return dict;
+            }, {});
+        } else {
+            return window.getComputedStyle(el)[keyOrObject];
+        }
+    }
+}
+
+function injectStylesheet() {
+    if (!document.head.querySelector('style#injected-stylesheet-curvy-tabs')) {
+        var el = document.createElement('style');
+        el.id = 'injected-stylesheet-curvy-tabs';
+        el.innerHTML = stylesheet;
+        document.head.insertBefore(el, document.head.firstElementChild);
+    }
 }
 
 function setContentsBorderRadius() {
-    var borderRadius = this.container.style.borderRadius;
-    getContentsArray.call(this).forEach(function(content) {
+    var borderRadius = this.contents.style.borderRadius;
+    this.contentDivs.forEach(function(content) {
         content.style.borderRadius = borderRadius;
     });
 }
 
+function contentStyle() {
+    return window.getComputedStyle(this.contents);
+}
+
+function borderWidth() {
+    return parseFloat(contentStyle.call(this).borderWidth);
+}
+
 function drawTab(content, x, onTop) {
     var gc = this.gc;
-    var height = this.canvas.height - 1;
-    var curveWidth = .5 * height;
+    var size = this.size - 1;
+    var curveWidth = .5 * size;
     var cw80 = this.curviness * 0.80 * curveWidth;
     var text = content.getAttribute('name');
     var w = Math.max(this.minWidth, PADDING + gc.measureText(text).width + PADDING);
-    var color = window.getComputedStyle(content).backgroundColor;
+
+    for (var el = content, color = TRANSPARENT; color === TRANSPARENT; el = el.parentElement) {
+        color = window.getComputedStyle(el).backgroundColor;
+        if (el === document.body) {
+            if (color === TRANSPARENT) {
+                color = 'white';
+            }
+            break;
+        }
+    }
 
     gc.save(); // Save current transformation
 
     gc.translate(x + .5, .5); // Translate to starting point
 
+    gc.lineWidth = borderWidth.call(this);
+
     if (onTop) {
         gc.beginPath();
-        gc.moveTo(GAP, height); // Begin a new subpath there
-        gc.lineTo(GAP + curveWidth + w + curveWidth, height);
+        gc.moveTo(GAP, size); // Begin a new subpath there
+        gc.lineTo(GAP + curveWidth + w + curveWidth, size);
         gc.strokeStyle = color;
         gc.stroke();
     }
 
     gc.beginPath();
-    gc.moveTo(0, height); // Begin a new subpath there
-    gc.lineTo(GAP, height);
+    gc.moveTo(0, size); // Begin a new subpath there
+    gc.lineTo(GAP, size);
     gc.translate(GAP, 0);
-    gc.bezierCurveTo(cw80, height, curveWidth - cw80, 0, curveWidth, 0);
+    gc.bezierCurveTo(cw80, size, curveWidth - cw80, 0, curveWidth, 0);
     gc.lineTo(curveWidth + w, 0);
     gc.translate(curveWidth + w, 0);
-    gc.bezierCurveTo(cw80, 0, curveWidth - cw80, height, curveWidth, height);
-    gc.lineTo(curveWidth + GAP, height);
+    gc.bezierCurveTo(cw80, 0, curveWidth - cw80, size, curveWidth, size);
+    gc.lineTo(curveWidth + GAP, size);
 
     if (!onTop) {
         gc.closePath();
@@ -225,9 +282,9 @@ function drawTab(content, x, onTop) {
     gc.fillStyle = color;
     gc.fill();
     gc.fillStyle = 'black';
-    gc.fillText(text, -w / 2, 2 * height / 3);
+    gc.fillText(text, -w / 2, 2 * size / 3);
 
-    gc.strokeStyle = this.borderColor;
+    gc.strokeStyle = contentStyle.call(this).borderColor;
     gc.stroke();
 
     gc.restore();
@@ -244,9 +301,9 @@ function selectDiv() {
 }
 
 function clickHandler(event) {
-    getContentsArray.call(this).find(function(content) {
+    this.contentDivs.find(function(content) {
         var props = this.tabs.get(content);
-        var margin = GAP + .25 * this.canvas.height;
+        var margin = GAP + .25 * this.size;
         var left = props.left + margin;
         if (event.offsetX > left && event.offsetX < left + props.width - margin - margin) {
             var stopPropagation = false,

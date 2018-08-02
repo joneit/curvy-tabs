@@ -3,10 +3,10 @@ See the [demo](https://joneit.github.io/curvy-tabs/1.0.0).
 ### Synopsis
 ```html
 <div class="curvy-tabs-container">
-  <div class="curvy-tabs-content" style="background-color:lightblue" name="Tab A">
+  <div style="background-color:lightblue" name="Tab A">
     Content for Tab A goes here.
   </div>
-  <div class="curvy-tabs-content" style="background-color:lightgreen" name="Tab B">
+  <div style="background-color:lightgreen" name="Tab B">
     Content for Tab B goes here.
   </div>
 </div>
@@ -19,7 +19,7 @@ From CDN:
 ```html
 <script src="https://joneit.github.io/curvy-tabs/1.0.0/curvy-tabs.min.js">
 ```
-The following instantiates the controller object and adds the tab bar (a `canvas` element) above the container element:
+The following instantiates the controller object, collecting all the content divs into a sub-div, and adds the tab bar (a `canvas` element) above it:
 ```js
 var container = document.querySelector('.curvy-tabs-container'); // or whatever
 var tabBar = new CurvyTabs(container);
@@ -27,10 +27,10 @@ tabBar.paint();
 ```
 The tabs are named after the content element names.
 ### API
-The first tab is selected by default. To programmatically specify some other tab, set `selected` to the content element:
+The first tab is selected by default. To programmatically specify some other tab, set `selected` to a specific content div, either of the following works:
 ```js
-var tabB = document.getElementByClassName('curvy-tabs-content')[1];
-tabBar.selected = tabB;  // or whatever
+tabBar.selected = tabBar.contents.children[1];
+tabBar.selected = tabBar.contents.querySelector('[name="Tab B"]');
 ```
 To select an alternative tab on instantiation:
 ```js
@@ -52,45 +52,58 @@ tabBar.font = '12pt cursive'; // accepts full CSS font spec
 ```
 To set the size of the tabs (for example to accommodate outsized fonts), :
 
-_Before instantiation,_ reset the default height (29 pixels):
+_Before instantiation,_ reset the default tab size (initially 29 pixels):
 ```js
-CurvyTabs.height = 40;
+CurvyTabs.size = 40;
 ```
 _After instantiation:_
 ```js
-tabBar.height = 40;
+tabBar.size = 40;
 ```
 The container _must_ have a width and height. The default is 500 &times; 500 pixels.
 
-_Before instantiation,_ use CSS (affects all instances):
+_Before instantiation,_ use CSS to change the default (affects all instances):
 ```html
 <style>
    .curvy-tabs-container { width: 750px; height: 1050px; }
 </style>
 ```
-_After instantiation,_ container's width can be set programmatically:
+_After instantiation,_ an instance's container width and height can be set programmatically:
 ```js
 tabBar.width = 750; // sets both the tab bar width and the container width
-tabBar.containerHeight = 1050;
+tabBar.height = 1050;
 ```
-To change the default border color (`#aaaaaa`):
+Background color, border color, and border width affect both the tab bar and content area and can be set as follows:
 
 _Before instantiation,_ use CSS (affects all instances):
 ```html
 <style>
-   .curvy-tabs-container { border-color: blue; }
+   .curvy-tabs-container > div {
+       border: 2x solid red;
+       background-color: yellow;
+    }
 </style>
 ```
-_After instantiation,_ can be set programmatically:
+_After instantiation,_ such styles can be set programmatically using the `css` method (works like [jQuery's `css` method](http://api.jquery.com/css/)):
 ```js
-tabBar.container.style.borderColor = 'blue';
-tabBar.paint();
+tabBar.css('borderColor', 'red'); // sets border color
+tabBar.css('borderColor'); // returns border color
+tabBar.css({ borderColor: 'yellow', backgroundColor: 'red' }); // sets both style properties
+tabBar.css(['borderColor', 'backgroundColor']); // returns style dictionary
 ```
-To change the default padding (`8px`), use CSS (affects all instances):
+(Note that the content area background color serves as a default for transparent tabs; there is no point in setting this if all your tabs colors.)
+
+To set styles on all the content divs at once:
+
+_Before instantiation,_ use CSS (affects all instances):
 ```html
 <style>
-    .curvy-tabs-content { padding: 3px }
+    .curvy-tabs-content > div > * { padding: 3px }
 </style>
+```
+_After instantiation,_ use the `contentCss` method (also like jQuery's `css` method):
+```js
+tabBar.contentCss('padding', '2px');
 ```
 ### Event Handlers
 #### `tabBar.onclick`
@@ -114,3 +127,11 @@ As above, calling `event.preventDefault()` from within will prevent the tab from
 
 ##### `event.stopPropagation()`
 The event will be propagated to the `tabBar.onclick` handler (if defined) unless you call `event.stopPropagation()` from within.
+
+## Version History
+* `1.0.0` — Initial version
+* `2.0.0`
+   * Cleaner DOM structure
+   * `height` is now `size`
+   * `containerHeight` is now `height`
+   * added `contents`, `contentDivs`, css`, and `contentCss`

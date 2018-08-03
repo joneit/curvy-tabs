@@ -1,4 +1,4 @@
-See the [demo](https://joneit.github.io/curvy-tabs/1.0.0).
+See the [demo](https://joneit.github.io/curvy-tabs/2.0.1).
 
 ### Synopsis
 ```html
@@ -17,7 +17,7 @@ var CurvyTabs = require('curvy-tab');
 ```
 From CDN:
 ```html
-<script src="https://joneit.github.io/curvy-tabs/1.0.0/curvy-tabs.min.js">
+<script src="https://joneit.github.io/curvy-tabs/2.0.1/curvy-tabs.min.js">
 ```
 The following instantiates the controller object, collecting all the content divs into a sub-div, and adds the tab bar (a `canvas` element) above it:
 ```js
@@ -135,3 +135,5 @@ The event will be propagated to the `tabBar.onclick` handler (if defined) unless
    * `height` is now `size`
    * `containerHeight` is now `height`
    * added `contents`, `contentDivs`, css`, and `contentCss`
+* `2.0.1`
+   * Bump version numbers in README.md

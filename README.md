@@ -50,61 +50,64 @@ To change the tab font:
 ```js
 tabBar.font = '12pt cursive'; // accepts full CSS font spec
 ```
-To set the size of the tabs (for example to accommodate outsized fonts), :
+To set the size (i.e., height) of the tabs (for example to accommodate outsized fonts):
 
-_Before instantiation,_ reset the default tab size (initially 29 pixels):
-```js
-CurvyTabs.size = 40;
-```
-_After instantiation:_
-```js
-tabBar.size = 40;
-```
+* _Before instantiation:_ Reset the default tab size (initially 29 pixels):
+    ```js
+    CurvyTabs.size = 40;
+    ```
+* _After instantiation:_
+    ```js
+    tabBar.size = 40;
+    ```
+
 The container _must_ have a width and height. The default is 500 &times; 500 pixels.
 
-_Before instantiation,_ use CSS to change the default (affects all instances):
-```html
-<style>
-   .curvy-tabs-container { width: 750px; height: 1050px; }
-</style>
-```
-_After instantiation,_ an instance's container width and height can be set programmatically:
-```js
-tabBar.width = 750; // sets both the tab bar width and the container width
-tabBar.height = 1050;
-```
+* _Declaratively, before instantiation:_ Use CSS to change the default (affects all instances):
+    ```html
+    <style>
+       .curvy-tabs-container { width: 750px; height: 1050px; }
+    </style>
+    ```
+* _Programmatically, after instantiation:_ An instance's container width and height can be set programmatically:
+    ```js
+    tabBar.width = 750; // sets both the tab bar width and the container width
+    tabBar.height = 1050;
+    ```
+
 Background color, border color, and border width affect both the tab bar and content area and can be set as follows:
 
-_Before instantiation,_ use CSS (affects all instances):
-```html
-<style>
-   .curvy-tabs-container > div {
-       border: 2x solid red;
-       background-color: yellow;
-    }
-</style>
-```
-_After instantiation,_ such styles can be set programmatically using the `css` method (works like [jQuery's `css` method](http://api.jquery.com/css/)):
-```js
-tabBar.css('borderColor', 'red'); // sets border color
-tabBar.css('borderColor'); // returns border color
-tabBar.css({ borderColor: 'yellow', backgroundColor: 'red' }); // sets both style properties
-tabBar.css(['borderColor', 'backgroundColor']); // returns style dictionary
-```
-(Note that the content area background color serves as a default for transparent tabs; there is no point in setting this if all your tabs colors.)
+* _Declaratively, before instantiation:_ Use CSS (affects all instances):
+    ```html
+    <style>
+       .curvy-tabs-container > div {
+           border: 2x solid red;
+           background-color: yellow;
+        }
+    </style>
+    ```
+* _Programmatically, after instantiation:_ Such styles can be set programmatically using the `css` method (works like [jQuery's `css` method](http://api.jquery.com/css/)):
+    ```js
+    tabBar.css('borderColor', 'red'); // sets border color
+    tabBar.css('borderColor'); // returns border color
+    tabBar.css({ borderColor: 'yellow', backgroundColor: 'red' }); // sets both style properties
+    tabBar.css(['borderColor', 'backgroundColor']); // returns style dictionary
+    ```
+(Note that the content area background color serves as a default for transparent tabs; there is no point in setting this if all your tabs have defined colors.)
 
 To set styles on all the content divs at once:
 
-_Before instantiation,_ use CSS (affects all instances):
-```html
-<style>
-    .curvy-tabs-content > div > * { padding: 3px }
-</style>
-```
-_After instantiation,_ use the `contentCss` method (also like jQuery's `css` method):
-```js
-tabBar.contentCss('padding', '2px');
-```
+* _Declaratively, before instantiation:_ Use CSS (affects all instances):
+    ```html
+    <style>
+        .curvy-tabs-content > div > * { padding: 3px }
+    </style>
+    ```
+* _Programmatically, after instantiation:_ Use the `contentCss` method (also like jQuery's `css` method):
+    ```js
+    tabBar.contentCss('padding', '2px');
+    ```
+
 ### Event Handlers
 #### `tabBar.onclick`
 If defined as a function, this event handler will be fired on every click of _any_ tab. The event object contains `content` (a reference to the content element to be displayed, whose `name` attribute is used as the tab label), `left` (horizontal pixel location of left edge of tab, and `width` (width of tab). For example:

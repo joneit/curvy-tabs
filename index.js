@@ -92,6 +92,18 @@ CurvyTabs.prototype = {
         this.paint();
     },
 
+    getTab: function(indexOrName) {
+        var tab = typeof indexOrName === 'number'
+            ? this.contents.children[indexOrName]
+            : this.contents.querySelector('[name="' + indexOrName + '"]');
+
+        if (!tab) {
+            throw new ReferenceError('Cannot find specified tab: ' + indexOrName);
+        }
+
+        return tab;
+    },
+
     get contentDivs() {
         return Array.prototype.slice.call(this.contents.children);
     },
@@ -157,6 +169,34 @@ CurvyTabs.prototype = {
         this.paint();
     },
 
+    select: function(indexOrName) {
+        this.selected = this.getTab(indexOrName);
+    },
+
+    clear: function(indexOrName) {
+        var tab = this.getTab(indexOrName);
+        while (tab.hasChildNodes()) {
+            tab.removeChild(tab.lastChild);
+        }
+    },
+
+    hide: function(indexOrName) {
+        this.toggle(indexOrName, false);
+    },
+
+    show: function(indexOrName) {
+        this.toggle(indexOrName, true);
+    },
+
+    toggle: function(indexOrName, visibility) {
+        var tab = this.getTab(indexOrName);
+        if (visibility === undefined) {
+            visibility = window.getComputedStyle(tab).display === 'none';
+        }
+        tab.style.display = visibility ? 'block' : 'none';
+        this.paint();
+    },
+
     css: function(keyOrObject, value) {
         css.call(this, this.contents, keyOrObject, value);
         this.height = this.height; // invoke setter to reset overlap per possible border width change; invokes paint()
@@ -176,7 +216,9 @@ CurvyTabs.prototype = {
         this.gc.clearRect(0, 0, this.canvas.width, this.size);
         this.gc.font = this.font;
 
-        var contents = this.contentDivs;
+        var contents = this.contentDivs.filter(function(content) {
+            return window.getComputedStyle(content).display === 'block';
+        });
         if (contents.length) {
             contents.forEach(function(content) {
                 var props = this.tabs.get(content);

@@ -31,11 +31,11 @@ The tabs are named after the content element names.
 
 #### `container` property
 
-The element that contains both the tab bar itself (a `<canvas>` element) and a `<div>` containing the content elements.
+An element (`div.curvy-tabs-container` in the above) that contains this instance’s tabs.
 
 #### `contents` property
 
-The `<div>` containing the content elements.
+A `<div>...</div>` element, programmatically created by the constructor to group all tabs’ content elements (the container’s children).
 
 #### `getTab` method
 
@@ -51,16 +51,17 @@ var tab = tabBar.getTab('Tab B'); // by name
 #### `selected` property and `select` method
 
 The first tab is selected by default.
-To programmatically specify some other tab, set `selected` to a specific content div, either of the following works:
+To select an alternative default tab on instantiation:
+```js
+var tabBar = new CurvyTabs(container, tabB);
+```
+To programmatically specify some other tab, set `selected` to a specific content element:
 ```js
 var tabB = tabBar.contents.children[1];
 // or:
 var tabB = tabBar.contents.querySelector('[name="Tab B"]');
-tabBar.selected = tabToSelect; // but see tabBar.select() method
-```
-To select an alternative tab on instantiation:
-```js
-var tabBar = new CurvyTabs(container, tabB);
+
+tabBar.selected = tabB;
 ```
 Or, use the `select` convenience method for setting `selected` property by tab index or name:
 ```js
@@ -73,9 +74,9 @@ tabBar.select('Tab B');
 
 To "clear" (removes all child elements from) the 2nd tab’s content element:
 ```js
-tabBar.select(1); // by index
+tabBar.clear(1); // by index
 // or:
-tabBar.select('Tab B'); // by name
+tabBar.clear('Tab B'); // by name
 ```
 
 #### Tab hide/show by index or name
@@ -98,7 +99,7 @@ To hide the 2nd tab, set 2nd content element’s `display` style:
     tabBar.paint();
     ```
 
-Or, use the `hide`, `show`, convenience methods to set a tab’s `display` property by index or name and call `paint` for you:
+Or, use the `toggle` or `hide` & `show` convenience methods to set a tab’s `display` property (by index or name) and then call `paint` for you:
 ```js
 var indexOrName = 1; // by index
 // or:
@@ -108,7 +109,7 @@ var indexOrName = 'Tab B'; // by name
 tabBar.hide(indexOrName);
 tabBar.toggle(indexOrName, false);
 
-// to hide:
+// to show:
 tabBar.show(indexOrName);
 tabBar.toggle(indexOrName, true);
 

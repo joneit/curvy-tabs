@@ -1,4 +1,4 @@
-See the [demo](https://joneit.github.io/curvy-tabs/2.0.1).
+See the [demo](https://joneit.github.io/curvy-tabs/2.1.1).
 
 ### Synopsis
 ```html
@@ -17,7 +17,7 @@ var CurvyTabs = require('curvy-tab');
 ```
 From CDN:
 ```html
-<script src="https://joneit.github.io/curvy-tabs/2.0.1/curvy-tabs.min.js">
+<script src="https://joneit.github.io/curvy-tabs/2.1.1/curvy-tabs.min.js">
 ```
 The following instantiates the controller object, collecting all the content divs into a sub-div, and adds the tab bar (a `canvas` element) above it:
 ```js
@@ -28,6 +28,10 @@ tabBar.paint();
 The tabs are named after the content element names.
 
 ### API
+
+#### `CurvyTabs.version` shared property (aka `constructor.version` property)
+
+Contains the version string `2.1.0` (major.minor.patch with no leading `v`).
 
 #### `container` property
 
@@ -231,7 +235,7 @@ The event will be propagated to the `tabBar.onclick` handler (if defined) unless
    * Cleaner DOM structure
    * `height` is now `size`
    * `containerHeight` is now `height`
-   * added `contents`, `contentDivs`, css`, and `contentCss`
+   * Add `contents`, `contentDivs`, css`, and `contentCss`
 * `2.0.1`
    * Bump version numbers in README.md
 * `2.1.0`
@@ -239,3 +243,7 @@ The event will be propagated to the `tabBar.onclick` handler (if defined) unless
    * Tab visibility now respects content div's `display` prop
    * Document how to hide a tab by setting content div's `display` prop
    * Add & document `hide`, `show`, and `toggle` convenience methods
+* `2.1.1`
+   * Bump version numbers in README.md (again) (doh!)
+   * Add `CurvyTabs.version` shared property
+   * Adjust build-and-push.sh to keep previous versions

@@ -1,4 +1,5 @@
 # run from master branch!
+# assumes gh-pages branch already exists
 
 npm run build
 
@@ -8,13 +9,12 @@ mv index.html $VER
 mkdir $VER/build
 mv build/*.js $VER/build
 
-git branch -D gh-pages
-git checkout -b gh-pages
+git checkout gh-pages
 rm .gitignore .npmignore *.md *.js *.html *.sh *.json
 git add $VER
 git status
 git commit -am $VER
 
-git push origin -f gh-pages
+git push origin gh-pages
 
 git checkout master

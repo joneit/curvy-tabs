@@ -1,3 +1,4 @@
+(function(){
 /* eslint-env browser */
 /* globals WeakMap */
 
@@ -276,4 +277,5 @@ function clickHandler(event) {
     }, this);
 }
 
-module.exports = CurvyTabs;
+window.CurvyTabs = CurvyTabs;
+})();

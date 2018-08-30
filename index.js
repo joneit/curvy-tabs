@@ -108,6 +108,10 @@ CurvyTabs.prototype = {
         return Array.prototype.slice.call(this.contents.children);
     },
 
+    forEach: function(iterator) {
+        this.contenDivs.forEach(iterator);
+    },
+
     get minWidth() {
         return this._minWidth;
     },
@@ -375,6 +379,6 @@ function clickHandler(event) {
     }, this);
 }
 
-CurvyTabs.version = '2.1.1';
+CurvyTabs.version = '2.2.0';
 
 module.exports = CurvyTabs;

@@ -19,131 +19,136 @@ From CDN:
 ```html
 <script src="https://joneit.github.io/curvy-tabs/2.1.1/curvy-tabs.min.js">
 ```
+
+### API
+
+#### `CurvyTabs.version` static property
+
+Contains the version string `2.1.0` (major.minor.patch with no leading `v`).
+
+#### `CurvyTabs` constructor
+
 The following instantiates the controller object, collecting all the content divs into a sub-div, and adds the tab bar (a `canvas` element) above it:
 ```js
 var container = document.querySelector('.curvy-tabs-container'); // or whatever
-var tabBar = new CurvyTabs(container);
+var tabBar = new CurvyTabs(container); // 1st parameter is required
 tabBar.paint();
 ```
 The tabs are named after the content element names.
 
-### API
+##### `selectedContentElement` parameter
 
-#### `CurvyTabs.version` shared property (aka `constructor.version` property)
+The first tab is selected by default but this can be overridden on instantiation by defining the optional 2nd parameter:
+```js
+var selectedContentElement = container.querySelector('[name="Tab B"]');
+var tabBar = new CurvyTabs(container, selectedContentElement);
+```
 
-Contains the version string `2.1.0` (major.minor.patch with no leading `v`).
+#### `CurvyTabs.prototype.getTab(indexOrName)` method
 
-#### `container` property
-
-An element (`div.curvy-tabs-container` in the above) that contains this instance’s tabs.
-
-#### `contents` property
-
-A `<div>...</div>` element, programmatically created by the constructor to group all tabs’ content elements (the container’s children).
-
-#### `getTab` method
-
-Convenience method to get a content element by index or name.
+To get a content element by index or name.
 
 For example, to get a reference to the 2nd tab’s content element:
 ```js
-var tab = tabBar.getTab(1); // by index (zero-based, so 1 means 2nd tab)
-// or:
+var tab = tabBar.getTab(1); // by zero-based index (so 1 means 2nd tab)
 var tab = tabBar.getTab('Tab B'); // by name
 ```
 
-#### `selected` property and `select` method
-
-The first tab is selected by default.
-To select an alternative default tab on instantiation:
+#### `CurvyTabs.prototype.selected` property
+To specify some other tab, set `selected` to a specific content element:
 ```js
-var tabBar = new CurvyTabs(container, tabB);
-```
-To programmatically specify some other tab, set `selected` to a specific content element:
-```js
-var tabB = tabBar.contents.children[1];
-// or:
-var tabB = tabBar.contents.querySelector('[name="Tab B"]');
+var tabB = tabBar.getTab(1); // by zero-based index
+var tabB = tabBar.getTab('Tab B'); // by name
 
 tabBar.selected = tabB;
 ```
-Or, use the `select` convenience method for setting `selected` property by tab index or name:
+#### `CurvyTabs.prototype.select(indexOrName)` method
+Or, use the `select` convenience method to set the `selected` property:
 ```js
-tabBar.select(1);
-// or:
-tabBar.select('Tab B');
+tabBar.select(1); // by zero-based index
+tabBar.select('Tab B'); // by name
 ```
 
-#### Tab `clear` method
+#### `CurvyTabs.prototype.clear(indexOrName)` method
 
 To "clear" (removes all child elements from) the 2nd tab’s content element:
 ```js
-tabBar.clear(1); // by index
-// or:
+tabBar.clear(1); // by zero-based index
 tabBar.clear('Tab B'); // by name
 ```
 
 #### Tab hide/show by index or name
 
-To hide the 2nd tab, set 2nd content element’s `display` style:
+All tabs are visible by default.
 
-* _Declaratively, before instantiation:_ Use CSS (affects all instances):
+To hide the a tab, say the 2nd tab (“Tab B”):
+
+* _Declaratively, before instantiation, use CSS to set a tab’s content element’s `display` style:
     ```html
     <style>
-        .curvy-tabs-content > div > *:nth-child(1) { display: none } /* zero-based */
-        /* or: */
-        .curvy-tabs-content > div > *[name="Tab B"] { display: none }
+        .curvy-tabs-container > div > :nth-child(2) { display: none } /* by one-based (!) indexed */
+        .curvy-tabs-container > div > [name="Tab B"] { display: none } /* by name */
     </style>
     ```
-* _Programmatically, after instantiation, set the `display` style property of the content div:
+* _Programmatically, after instantiation:
     ```js
-    tabBar.contents.querySelector(1).style.display = 'none'; // default is 'block'
-    // or:
-    tabBar.contents.querySelector('[name="Tab B"]').style.display = 'none';
-    tabBar.paint();
+    tobBar.hide(1); // by zero-based index
+    tobBar.hide('Tab B'); // by name
     ```
 
-Or, use the `toggle` or `hide` & `show` convenience methods to set a tab’s `display` property (by index or name) and then call `paint` for you:
+##### `CurvyTabs.prototype.hide(indexOrName)` method
+Given:
 ```js
-var indexOrName = 1; // by index
-// or:
+var indexOrName = 1; // by zero-based index
 var indexOrName = 'Tab B'; // by name
-
-// to hide:
+```
+Either of:
+```js
 tabBar.hide(indexOrName);
-tabBar.toggle(indexOrName, false);
-
-// to show:
-tabBar.show(indexOrName);
-tabBar.toggle(indexOrName, true);
-
-// to flip:
-tabBar.toggle(indexOrName); // hides if visible or shows if hidden
 ```
 
-#### Tab `curviness` property
+##### `CurvyTabs.prototype.show(indexOrName)` method
+Either of:
+```js
+tabBar.show(indexOrName);
+```
+
+##### `CurvyTabs.prototype.toggle(indexOrName, isVisible)` method
+To hide if visible or show if hidden:
+```js
+tabBar.toggle(indexOrName);
+```
+The optional second parameter `isVisible` forces visibility:
+```js
+tabBar.toggle(indexOrName, false); // same as tabBar.hide(indexOrName)
+tabBar.toggle(indexOrName, true); // same as tabBar.show(indexOrName)
+```
+
+#### `CurvyTabs.prototype.curviness` property
 
 To change the curviness of the tab outlines:
 ```js
-tabBar.curviness = 0; // no curves at all (looks exactly like Chrome's tabs)
-tabBar.curviness = 0.5; // somewhat flattened curves
-tabBar.curviness = 1; // full curviness (default)
+tabBar.curviness = 0; // not curvy at all (looks exactly like Chrome's tabs)
+tabBar.curviness = 0.5; // somewhat curvy
+tabBar.curviness = 1; // fully curvy (default)
 ```
 
-#### Tab `minWidth` property
+#### `CurvyTabs.prototype.minWidth` property
 
 Tabs are sized proportional to their labels. To make all tabs the same width:
 ```
 tabBar.minWidth = 100; // Tabs whose text exceeds 100 pixels are widened to accommodate
 ```
 
-#### Tab `font` property
+#### `CurvyTabs.prototype.font` property
 
 To change the tab font:
 ```js
 tabBar.font = '12pt cursive'; // accepts full CSS font spec
 ```
-To set the size (i.e., height) of the tabs (for example to accommodate outsized fonts):
+
+#### `CurvyTabs.prototype.size` property
+To set the size (_i.e.,_ height) of the tabs (for example to accommodate outsized fonts):
 
 * _Before instantiation:_ Reset the default tab size (initially 29 pixels):
     ```js
@@ -154,7 +159,7 @@ To set the size (i.e., height) of the tabs (for example to accommodate outsized 
     tabBar.size = 40;
     ```
 
-#### Container `width` and `height` property
+#### `CurvyTabs.prototype.width` and `CurvyTabs.prototype.height` property
 
 The container _must_ have a width and height. The default is 500 &times; 500 pixels.
 
@@ -170,7 +175,7 @@ The container _must_ have a width and height. The default is 500 &times; 500 pix
     tabBar.height = 1050;
     ```
 
-#### `css` method
+#### `CurvyTabs.prototype.css` method
 
 The tab bar’s background color, border color, and border width affect both the tab bar and content area and can be set as follows:
 
@@ -192,13 +197,13 @@ The tab bar’s background color, border color, and border width affect both the
     ```
 (Note that the tab bar’s background color is only visible through transparent tabs; there is no point in setting this if _all_ your tabs have defined colors.)
 
-#### Tab `contentCss` method
+#### `CurvyTabs.prototype.contentCss` method
 To set styles on all the content divs at once:
 
 * _Declaratively, before instantiation:_ Use CSS (affects all instances):
     ```html
     <style>
-        .curvy-tabs-content > div > * { padding: 3px }
+        .curvy-tabs-container > div > * { padding: 3px }
     </style>
     ```
 * _Programmatically, after instantiation:_ Use the `contentCss` method (also like jQuery's `css` method):
@@ -206,22 +211,50 @@ To set styles on all the content divs at once:
     tabBar.contentCss('padding', '2px');
     ```
 
+#### `CurvyTabs.prototype.container` property
+An element (`div.curvy-tabs-container` in the above) that contains this instance’s tabs.
+
+#### `CurvyTabs.prototype.contents` property
+A `<div>...</div>` element, programmatically created by the constructor to group all tabs’ content elements (the container’s children).
+
+#### `CurvyTabs.prototype.forEach(iterator)` method
+
+To iterate through all the tabs’ content elements (`contents.children`):
+```js
+tabBar.forEach(function(tabEl) {
+    console.log(tabEl.getAttribute('name'));
+});
+```
+The above logs:
+```
+Tab A
+Tab B
+```
+See [`Array.prototype.forEach`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach) for more information, including the definition of `iterator`.
+
 ### Event Handlers
 #### `tabBar.onclick`
-If defined as a function, this event handler will be fired on every click of _any_ tab. The event object contains `content` (a reference to the content element to be displayed, whose `name` attribute is used as the tab label), `left` (horizontal pixel location of left edge of tab, and `width` (width of tab). For example:
+If defined as a function, this event handler will be fired on every click of _any_ tab. The event object contains `content` (a reference to the content element to be displayed, whose `name` attribute is used as the tab label), `left` (horizontal pixel location of left edge of tab, and `width` (width of tab).
+
+For example, either of:
 ```js
 tabBar.onclick = function(event) {
     console.log('tab clicked:', event.content.getAttribute('name'));
 };
+tabBar.addEventListener('click', function(event) {
+    console.log('tab clicked:', event.content.getAttribute('name'));
+});
 ```
 ##### `event.preventDefault()`
 Calling `event.preventDefault()` from this handler will prevent the clicked tab from being selected. Therefore, this is a way of disabling all tabs.
 
 #### `tab.onclick`
-In addition, each tab may also define its own event handler, fired only when that tab is clicked on. For example:
+In addition, each tab may also define its own event handler, fired only when that tab is clicked on.
+
+For example, either of:
 ```js
-var content = this.tabBar.container.querySelector('.curvy-tabs-content'); // eg, first tab
-tabBar.tabs.get(content).onclick = function(event) { ... }; // tabs is a WeakMap
+tabBar.getTab(0).onclick = function(event) { ... };
+tabBar.getTab(0).addEventListener('onclick', function(event) { ... });
 ```
 ##### `event.preventDefault()`
 As above, calling `event.preventDefault()` from within will prevent the tab from being selected. This is a way of disabling just this specific tab.
@@ -230,20 +263,21 @@ As above, calling `event.preventDefault()` from within will prevent the tab from
 The event will be propagated to the `tabBar.onclick` handler (if defined) unless you call `event.stopPropagation()` from within.
 
 ## Version History
-* `1.0.0` — Initial version
-* `2.0.0`
-   * Cleaner DOM structure
-   * `height` is now `size`
-   * `containerHeight` is now `height`
-   * Add `contents`, `contentDivs`, css`, and `contentCss`
-* `2.0.1`
-   * Bump version numbers in README.md
-* `2.1.0`
-   * Add & document `getTab`, `select`, and `clear` convenience methods
-   * Tab visibility now respects content div's `display` prop
-   * Document how to hide a tab by setting content div's `display` prop
-   * Add & document `hide`, `show`, and `toggle` convenience methods
+* `2.2.0`
+   * Add [`forEach`](#curvytabsprototypeforeachiterator-method) method
 * `2.1.1`
    * Bump version numbers in README.md (again) (doh!)
-   * Add `CurvyTabs.version` shared property
+   * Add [`CurvyTabs.version`](#curvytabsversion-static-property) static property
    * Adjust build-and-push.sh to keep previous versions
+* `2.1.0`
+   * Add & document [`getTab`](#curvytabsprototypegettabindexorname-method), [`select`](#curvytabsprototypeselectindexorname-method), [`clear`](#curvytabsprototypeclearindexorname-method), [`hide`](#curvytabsprototypehideindexorname-method), [`show`](#curvytabsprototypeshowindexorname-method), and [`toggle`](#curvytabsprototypetoggleindexorname-isvisible-method) methods
+   * Tab visibility now respects content div's `display` style
+   * Document how to hide a tab by setting content div's `display` style
+* `2.0.1`
+   * Bump version numbers in README.md
+* `2.0.0`
+   * Cleaner DOM structure
+   * `height` is now [`size`](#curvytabsprototypesize-property)
+   * `containerHeight` is now [`height`](#curvytabsprototypewidth-and-curvytabsprototypeheight-property)
+   * Add [`contents`](#curvytabsprototypecontents-property), ~~`contentDivs`~~, [`css`](#curvytabsprototypecss-method), and [`contentCss`](#curvytabsprototypecontentcss-method)
+* `1.0.0` — Initial version

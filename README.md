@@ -13,7 +13,7 @@ See the [demo](https://joneit.github.io/curvy-tabs/2.1.1).
 ```
 As npm module:
 ```js
-var CurvyTabs = require('curvy-tab');
+var CurvyTabs = require('curvy-tabs');
 ```
 From CDN:
 ```html
@@ -22,16 +22,12 @@ From CDN:
 
 ### API
 
-#### `CurvyTabs.version` static property
-
-Contains the version string `2.1.0` (major.minor.patch with no leading `v`).
-
 #### `CurvyTabs` constructor
 
 The following instantiates the controller object, collecting all the content divs into a sub-div, and adds the tab bar (a `canvas` element) above it:
 ```js
 var container = document.querySelector('.curvy-tabs-container'); // or whatever
-var tabBar = new CurvyTabs(container); // 1st parameter is required
+var tabBar = new CurvyTabs(container, selectedContentElement); // 1st param required, 2nd optional
 tabBar.paint();
 ```
 The tabs are named after the content element names.
@@ -43,6 +39,10 @@ The first tab is selected by default but this can be overridden on instantiation
 var selectedContentElement = container.querySelector('[name="Tab B"]');
 var tabBar = new CurvyTabs(container, selectedContentElement);
 ```
+
+#### `CurvyTabs.version` static property
+
+Contains the version string `2.3.1` (major.minor.patch with no leading `v`).
 
 #### `CurvyTabs.prototype.getTab(idxOrNamOrEl)` method
 
@@ -269,7 +269,7 @@ As above, calling `event.preventDefault()` from within will prevent the tab from
 The event will be propagated to the `tabBar.onclick` handler (if defined) unless you call `event.stopPropagation()` from within.
 
 ## See Also
-* `curvy-tabs-pager` ([npm](https://npmjs.org/package/curvy-tabs), [github](https://github.com/joneit/curvy-tabs-pager)) which implements paged content for curvy-tab bars.
+* `curvy-tabs-pager` ([npm](https://npmjs.org/package/curvy-tabs-pager), [github](https://github.com/joneit/curvy-tabs-pager)) which implements paged content for curvy-tab bars.
 
 ## Version History
 * `2.3.1`

@@ -1,6 +1,6 @@
 {
   "name": "curvy-tabs",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Tab bar with fancy tabs",
   "main": "index.js",
   "scripts": {

@@ -269,9 +269,12 @@ As above, calling `event.preventDefault()` from within will prevent the tab from
 The event will be propagated to the `tabBar.onclick` handler (if defined) unless you call `event.stopPropagation()` from within.
 
 ## See Also
-* [`curvy-tab-pager`](curvy-tab-pager) which implements paged content for a curvy-tab tab bar.
+* `curvy-tabs-pager` ([npm](https://npmjs.org/package/curvy-tabs), [github](https://github.com/joneit/curvy-tabs-pager)) which implements paged content for curvy-tab bars.
 
 ## Version History
+* `2.3.1`
+   * Bump `CurvyTabs.version`
+   * Fix bad link to curvy-tabs-pager in README.md
 * `2.3.0`
    * Attempts to hide the current tab with the [`hide`](#curvytabsprototypehideidxornamorel-method), [`toggle`](#curvytabsprototypetoggleidxornamorel-isvisible-method), or [`reset`](#curvytabsprototyperesetidxornamorel-method) methods are ignored with a console warning.
    * Add [`reset`](#curbytabsprototypereset-method) method

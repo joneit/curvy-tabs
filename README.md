@@ -44,7 +44,7 @@ var selectedContentElement = container.querySelector('[name="Tab B"]');
 var tabBar = new CurvyTabs(container, selectedContentElement);
 ```
 
-#### `CurvyTabs.prototype.getTab(indexOrName)` method
+#### `CurvyTabs.prototype.getTab(idxOrNamOrEl)` method
 
 To get a content element by index or name.
 
@@ -53,6 +53,7 @@ For example, to get a reference to the 2nd tab’s content element:
 var tab = tabBar.getTab(1); // by zero-based index (so 1 means 2nd tab)
 var tab = tabBar.getTab('Tab B'); // by name
 ```
+Note that `tabBar.getTab(tab) === tab`.
 
 #### `CurvyTabs.prototype.selected` property
 To specify some other tab, set `selected` to a specific content element:
@@ -62,19 +63,21 @@ var tabB = tabBar.getTab('Tab B'); // by name
 
 tabBar.selected = tabB;
 ```
-#### `CurvyTabs.prototype.select(indexOrName)` method
+#### `CurvyTabs.prototype.select(idxOrNamOrEl)` method
 Or, use the `select` convenience method to set the `selected` property:
 ```js
 tabBar.select(1); // by zero-based index
 tabBar.select('Tab B'); // by name
+tabBar.select(tabEl); // when you already have a reference to a tab element
 ```
 
-#### `CurvyTabs.prototype.clear(indexOrName)` method
+#### `CurvyTabs.prototype.clear(idxOrNamOrEl)` method
 
 To "clear" (removes all child elements from) the 2nd tab’s content element:
 ```js
 tabBar.clear(1); // by zero-based index
 tabBar.clear('Tab B'); // by name
+tabBar.clear(tabEl); // when you already have a reference to a tab element
 ```
 
 #### Tab hide/show by index or name
@@ -96,39 +99,36 @@ To hide the a tab, say the 2nd tab (“Tab B”):
     tobBar.hide('Tab B'); // by name
     ```
 
-##### `CurvyTabs.prototype.hide(indexOrName)` method
-Given:
+##### `CurvyTabs.prototype.hide(idxOrNamOrEl)` method
 ```js
-var indexOrName = 1; // by zero-based index
-var indexOrName = 'Tab B'; // by name
+var idxOrNamOrEl = 1; // by zero-based index
+var idxOrNamOrEl = 'Tab B'; // by name
+var idxOrNamOrEl = tabEl; // when you already have a reference to a tab element
+tabBar.hide(idxOrNamOrEl);
 ```
-Either of:
+<strong>Caveat:</strong> Attempts to hide the current tab are ignored with a console warning. Be sure to switch to a visible tab first.
+
+##### `CurvyTabs.prototype.show(idxOrNamOrEl)` method
 ```js
-tabBar.hide(indexOrName);
+tabBar.show(idxOrNamOrEl);
 ```
 
-##### `CurvyTabs.prototype.show(indexOrName)` method
-Either of:
-```js
-tabBar.show(indexOrName);
-```
-
-##### `CurvyTabs.prototype.toggle(indexOrName, isVisible)` method
+##### `CurvyTabs.prototype.toggle(idxOrNamOrEl, isVisible)` method
 To hide if visible or show if hidden:
 ```js
-tabBar.toggle(indexOrName);
+tabBar.toggle(idxOrNamOrEl);
 ```
 The optional second parameter `isVisible` forces visibility:
 ```js
-tabBar.toggle(indexOrName, false); // same as tabBar.hide(indexOrName)
-tabBar.toggle(indexOrName, true); // same as tabBar.show(indexOrName)
+tabBar.toggle(idxOrNamOrEl, false); // same as tabBar.hide(idxOrNamOrEl)
+tabBar.toggle(idxOrNamOrEl, true); // same as tabBar.show(idxOrNamOrEl)
 ```
 
 #### `CurvyTabs.prototype.curviness` property
 
 To change the curviness of the tab outlines:
 ```js
-tabBar.curviness = 0; // not curvy at all (looks exactly like Chrome's tabs)
+tabBar.curviness = 0; // not curvy at all, exactly like Chrome's tabs (prior to version 69)
 tabBar.curviness = 0.5; // somewhat curvy
 tabBar.curviness = 1; // fully curvy (default)
 ```
@@ -232,6 +232,12 @@ Tab B
 ```
 See [`Array.prototype.forEach`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach) for more information, including the definition of `iterator`.
 
+#### `CurvyTabs.prototype.reset(save)` method
+
+Two overloads:
+* `reset()` — Resets each tab to its visibility based on the value of its `display` style at the time the tab was loaded, or the last time `tabBar.reset(true)` was called
+* `reset(true)` — Saves the state of each tab’s `display` style for future reference by a `reset()` call.
+
 ### Event Handlers
 #### `tabBar.onclick`
 If defined as a function, this event handler will be fired on every click of _any_ tab. The event object contains `content` (a reference to the content element to be displayed, whose `name` attribute is used as the tab label), `left` (horizontal pixel location of left edge of tab, and `width` (width of tab).
@@ -262,7 +268,14 @@ As above, calling `event.preventDefault()` from within will prevent the tab from
 ##### `event.stopPropagation()`
 The event will be propagated to the `tabBar.onclick` handler (if defined) unless you call `event.stopPropagation()` from within.
 
+## See Also
+* [`curvy-tab-pager`](curvy-tab-pager) which implements paged content for a curvy-tab tab bar.
+
 ## Version History
+* `2.3.0`
+   * Attempts to hide the current tab with the [`hide`](#curvytabsprototypehideidxornamorel-method), [`toggle`](#curvytabsprototypetoggleidxornamorel-isvisible-method), or [`reset`](#curvytabsprototyperesetidxornamorel-method) methods are ignored with a console warning.
+   * Add [`reset`](#curbytabsprototypereset-method) method
+   * All methods that previously had `indexOrName` overloads now have `idxOrNamOrEl` overloads — meaning that they all now accept an already known tab element in addition to its index or name. Previously if you already had the element, you couldn't just pass `el`; you would have had to pass `el.getAttribute('name')`. This would deref the name just so `getTab` could then search for the element by name.
 * `2.2.0`
    * Add [`forEach`](#curvytabsprototypeforeachiterator-method) method
 * `2.1.1`
@@ -270,7 +283,7 @@ The event will be propagated to the `tabBar.onclick` handler (if defined) unless
    * Add [`CurvyTabs.version`](#curvytabsversion-static-property) static property
    * Adjust build-and-push.sh to keep previous versions
 * `2.1.0`
-   * Add & document [`getTab`](#curvytabsprototypegettabindexorname-method), [`select`](#curvytabsprototypeselectindexorname-method), [`clear`](#curvytabsprototypeclearindexorname-method), [`hide`](#curvytabsprototypehideindexorname-method), [`show`](#curvytabsprototypeshowindexorname-method), and [`toggle`](#curvytabsprototypetoggleindexorname-isvisible-method) methods
+   * Add & document [`getTab`](#curvytabsprototypegettabidxornamorel-method), [`select`](#curvytabsprototypeselectidxornamorel-method), [`clear`](#curvytabsprototypeclearidxornamorel-method), [`hide`](#curvytabsprototypehideidxornamorel-method), [`show`](#curvytabsprototypeshowidxornamorel-method), and [`toggle`](#curvytabsprototypetoggleidxornamorel-isvisible-method) methods
    * Tab visibility now respects content div's `display` style
    * Document how to hide a tab by setting content div's `display` style
 * `2.0.1`

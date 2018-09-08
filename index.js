@@ -51,6 +51,7 @@ function CurvyTabs(container, selectedContentElement) {
 
     var contents = this.contents = document.createElement('div');
     children.forEach(function(child) {
+        child.dataset.display = window.getComputedStyle(child).display;
         contents.appendChild(child);
     });
     container.appendChild(contents);
@@ -78,27 +79,34 @@ CurvyTabs.prototype = {
     constructor: CurvyTabs,
 
     addTab: function(name, html, color) {
-        var content = document.createElement('div');
-        content.setAttribute('name', name);
+        var el = document.createElement('div');
+        el.setAttribute('name', name);
         if (html) {
-            content.innerHTML = html;
+            el.innerHTML = html;
         }
         if (color) {
-            content.style.backgroundColor = color;
+            el.style.backgroundColor = color;
         }
-        this.tabs.set(content, {});
-        this.contents.appendChild(content);
-        this.selected = content;
+        el.dataset.display = window.getComputedStyle(el).display;
+        this.tabs.set(el, {});
+        this.contents.appendChild(el);
+        this.selected = el;
         this.paint();
     },
 
-    getTab: function(indexOrName) {
-        var tab = typeof indexOrName === 'number'
-            ? this.contents.children[indexOrName]
-            : this.contents.querySelector('[name="' + indexOrName + '"]');
+    getTab: function(idxOrNamOrEl) {
+        var tab;
 
-        if (!tab) {
-            throw new ReferenceError('Cannot find specified tab: ' + indexOrName);
+        if (idxOrNamOrEl instanceof HTMLElement) {
+            tab = idxOrNamOrEl;
+        } else {
+            tab = typeof idxOrNamOrEl === 'number'
+                ? this.contents.children[idxOrNamOrEl]
+                : this.contents.querySelector('[name="' + idxOrNamOrEl + '"]');
+
+            if (!tab) {
+                throw new ReferenceError('Cannot find specified tab: ' + indexOrName);
+            }
         }
 
         return tab;
@@ -173,32 +181,46 @@ CurvyTabs.prototype = {
         this.paint();
     },
 
-    select: function(indexOrName) {
-        this.selected = this.getTab(indexOrName);
+    select: function(idxOrNamOrEl) {
+        this.selected = this.getTab(idxOrNamOrEl);
     },
 
-    clear: function(indexOrName) {
-        var tab = this.getTab(indexOrName);
+    clear: function(idxOrNamOrEl) {
+        var tab = this.getTab(idxOrNamOrEl);
         while (tab.hasChildNodes()) {
             tab.removeChild(tab.lastChild);
         }
     },
 
-    hide: function(indexOrName) {
-        this.toggle(indexOrName, false);
+    hide: function(idxOrNamOrEl) {
+        this.toggle(idxOrNamOrEl, false);
     },
 
-    show: function(indexOrName) {
-        this.toggle(indexOrName, true);
+    show: function(idxOrNamOrEl) {
+        this.toggle(idxOrNamOrEl, true);
     },
 
-    toggle: function(indexOrName, visibility) {
-        var tab = this.getTab(indexOrName);
+    toggle: function(idxOrNamOrEl, visibility) {
+        var tab = this.getTab(idxOrNamOrEl);
         if (visibility === undefined) {
             visibility = window.getComputedStyle(tab).display === 'none';
         }
-        tab.style.display = visibility ? 'block' : 'none';
-        this.paint();
+        if (!visibility && tab === this.selected) {
+            console.warn('Attempt to hide currently selected tab ignored.');
+        } else {
+            tab.style.display = visibility ? 'block' : 'none';
+            this.paint();
+        }
+    },
+
+    reset: function(save) {
+        this.contentDivs.forEach(function(el) {
+            if (save) {
+                el.dataset.display = window.getComputedStyle(el).display;
+            } else {
+                this.toggle(el, el.dataset.display !== 'none');
+            }
+        }, this);
     },
 
     css: function(keyOrObject, value) {

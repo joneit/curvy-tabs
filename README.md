@@ -42,7 +42,7 @@ var tabBar = new CurvyTabs(container, selectedContentElement);
 
 #### `CurvyTabs.version` static property
 
-Contains the version string `2.3.1` (major.minor.patch with no leading `v`).
+Contains the version string `2.3.2` (major.minor.patch of current version, with no leading `v`).
 
 #### `CurvyTabs.prototype.getTab(idxOrNamOrEl)` method
 
@@ -272,6 +272,10 @@ The event will be propagated to the `tabBar.onclick` handler (if defined) unless
 * `curvy-tabs-pager` ([npm](https://npmjs.org/package/curvy-tabs-pager), [github](https://github.com/joneit/curvy-tabs-pager)) which implements paged content for curvy-tab bars.
 
 ## Version History
+See [version-history.md](version-history.md
+* `2.3.2`
+   * Fix `catch` that was itself was throwing error (in `getTab` on unknown tab)
+   * Improved build
 * `2.3.1`
    * Bump `CurvyTabs.version`
    * Fix bad link to curvy-tabs-pager in README.md

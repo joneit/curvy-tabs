@@ -105,7 +105,7 @@ CurvyTabs.prototype = {
                 : this.contents.querySelector('[name="' + idxOrNamOrEl + '"]');
 
             if (!tab) {
-                throw new ReferenceError('Cannot find specified tab: ' + indexOrName);
+                throw new ReferenceError('Cannot find specified tab: ' + idxOrNamOrEl);
             }
         }
 
@@ -401,6 +401,6 @@ function clickHandler(event) {
     }, this);
 }
 
-CurvyTabs.version = '2.3.1';
+CurvyTabs.version = '2.3.2';
 
 module.exports = CurvyTabs;

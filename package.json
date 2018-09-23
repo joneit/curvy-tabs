@@ -1,10 +1,10 @@
 {
   "name": "curvy-tabs",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Tab bar with fancy tabs",
   "main": "index.js",
   "scripts": {
-    "build": "echo '(function(){' >build/curvy-tabs.js; sed 's/module.exports =/window.CurvyTabs =/' index.js >>build/curvy-tabs.js; echo '})();' >>build/curvy-tabs.js; uglifyjs build/curvy-tabs.js -cmo build/curvy-tabs.min.js; ls -lahL build",
+    "build": "sh build.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

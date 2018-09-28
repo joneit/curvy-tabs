@@ -38,6 +38,8 @@ var GAP = 4, PADDING = 4;
 
 var TRANSPARENT = 'rgba(0, 0, 0, 0)';
 
+var RATIO;
+
 function CurvyTabs(container, selectedContentElement) {
     injectStylesheet();
 
@@ -65,12 +67,27 @@ function CurvyTabs(container, selectedContentElement) {
 
     var containerRect = container.getBoundingClientRect();
     var canvas = this.canvas = document.createElement('canvas');
+    var gc = this.gc = canvas.getContext('2d');
+
+    // get device pixel ratio
+    RATIO = (
+        window.devicePixelRatio || 1
+    ) / (
+        gc.webkitBackingStorePixelRatio ||
+        gc.mozBackingStorePixelRatio ||
+        gc.msBackingStorePixelRatio ||
+        gc.oBackingStorePixelRatio ||
+        gc.backingStorePixelRatio || 1
+    );
+
     container.appendChild(canvas);
-    canvas.width = containerRect.width;
-    this.size = CurvyTabs.size;
+
+    this.width = containerRect.width; // invoke setter to set canvas width and resolution
+    this.size = CurvyTabs.size; // invoke setter to set canvas height and resolution
+
     this.height = this.height; // invoke setter to calculate and set content height; invokes paint()
 
-    this.canvas.addEventListener('click', clickHandler.bind(this));
+    canvas.addEventListener('click', clickHandler.bind(this));
 }
 
 CurvyTabs.size = 29;
@@ -129,20 +146,27 @@ CurvyTabs.prototype = {
     },
 
     get width() {
-        return this.width;
+        return this._width;
     },
     set width(width) {
-        tabBar.container.style.width = width + 'px';
-        tabBar.canvas.width = tabBar.container.getBoundingClientRect().width;
-        tabBar.paint();
+        width = Math.floor(width);
+        this._width = width;
+        this.canvas.width = width * RATIO;
+        this.container.style.width = width + 'px';
+        this.gc.scale(RATIO, RATIO);
+        this.paint();
     },
 
     get size() {
-        return this.canvas.height;
+        return this._height;
     },
-    set size(size) {
-        this.canvas.height = size;
-        this.contents.style.top = size - 1 + 'px';
+    set size(height) {
+        height = Math.floor(height);
+        this._height = height;
+        this.canvas.height = height * RATIO;
+        this.canvas.style.height = height + 'px';
+        this.gc.scale(RATIO, RATIO);
+        this.contents.style.top = height - 1 + 'px';
         this.paint();
     },
 
@@ -237,7 +261,6 @@ CurvyTabs.prototype = {
     paint: function() {
         var x = 8;
 
-        this.gc = this.canvas.getContext('2d');
         this.gc.textAlign = 'center';
         this.gc.clearRect(0, 0, this.canvas.width, this.size);
         this.gc.font = this.font;
@@ -401,6 +424,6 @@ function clickHandler(event) {
     }, this);
 }
 
-CurvyTabs.version = '2.3.2';
+CurvyTabs.version = '2.3.3';
 
 module.exports = CurvyTabs;

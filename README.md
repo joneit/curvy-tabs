@@ -17,8 +17,10 @@ var CurvyTabs = require('curvy-tabs');
 ```
 From CDN:
 ```html
-<script src="https://joneit.github.io/curvy-tabs/2.1.1/curvy-tabs.min.js">
+<script src="https://unpkg.com/curvy-tabs@2.3/umd/curvy-tabs.js"></script>
+<script src="https://unpkg.com/curvy-tabs@2.3/umd/curvy-tabs.min.js"></script>
 ```
+Any [SEMVER](//semver.org) string can be used. `2.3` in the above means load the latest of the 2.3.* range. See the [npm semver calculator](//semver.npmjs.com) and npm’s [semantic versioning](https://docs.npmjs.com/misc/semver) page.
 
 ### API
 
@@ -272,6 +274,10 @@ The event will be propagated to the `tabBar.onclick` handler (if defined) unless
 * `curvy-tabs-pager` ([npm](https://npmjs.org/package/curvy-tabs-pager), [github](https://github.com/joneit/curvy-tabs-pager)) which implements paged content for curvy-tab bars.
 
 ## Version History
+* `2.3.5`
+   * Update `version` property value.
+* `2.3.4`
+   * Add `umd` folder for `unpkg` CDN support. (See revised installation above.)
 * `2.3.3`
    * Fix `width` setter (was always throwing error)
    * Set `<canvas>` element to device’s resolution for crisper imaginge (especially text) on high-DPI devices (like Apple Retina screen)

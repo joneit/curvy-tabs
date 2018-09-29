@@ -1,13 +1,18 @@
-NAME=CurvyTabs
+GLOBAL_NAME=CurvyTabs
 
-MODNAM=$(cat package.json | sed -En 's/.*"name": "(.*)".*/\1/p')
+MODULE_NAME=$(cat package.json | sed -En 's/.*"name": "(.*)".*/\1/p')
 
-mkdir build 2>/dev/null
+VER=$(cat package.json | sed -En 's/.*"([0-9]+\.[0-9]+\.[0-9]+)".*/\1/p')
 
-echo '(function(){' > build/$MODNAM.js
-sed 's/module.exports =/window.'$NAME' =/' index.js >> build/$MODNAM.js
-echo '})();' >> build/$MODNAM.js
+# update the `version` property in the code with value from package.json
+sed -i '' -E 's/[0-9]+\.[0-9]+\.[0-9]+/'${VER}'/' index.js
 
-uglifyjs build/$MODNAM.js -cmo build/$MODNAM.min.js
+mkdir umd 2>/dev/null
 
-ls -lahL build
+echo '(function(){' > umd/$MODULE_NAME.js
+sed 's/module.exports =/window.'GLOBAL_$NAME' =/' index.js >> umd/$MODULE_NAME.js
+echo '})();' >> umd/$MODULE_NAME.js
+
+uglifyjs umd/$MODULE_NAME.js -cmo umd/$MODULE_NAME.min.js
+
+ls -lahL umd

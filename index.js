@@ -424,6 +424,6 @@ function clickHandler(event) {
     }, this);
 }
 
-CurvyTabs.version = '2.3.5';
+CurvyTabs.version = '2.3.6';
 
 module.exports = CurvyTabs;

@@ -274,11 +274,13 @@ The event will be propagated to the `tabBar.onclick` handler (if defined) unless
 * `curvy-tabs-pager` ([npm](https://npmjs.org/package/curvy-tabs-pager), [github](https://github.com/joneit/curvy-tabs-pager)) which implements paged content for curvy-tab bars.
 
 ## Version History
+* `2.3.7` (10/11/2018)
+   * Ignore hidden tabs in click handler
 * `2.3.6`
-   * Correct the global property name set by CDN version.
-   * Update build.sh to always set correct global property in CDN version.
+   * Correct the global property name set by CDN version
+   * Update build.sh to always set correct global property in CDN version
 * `2.3.5`
-   * Update build.sh to always set correct value for `CurvyTabs.version` property.
+   * Update build.sh to always set correct value for `CurvyTabs.version` property
 * `2.3.4`
    * Update build.sh to create `umd` folder for `unpkg.com` CDN support for this and all future versions. See revised installation snippet above. (`curvy-tabs-pager.github.io` will no longer be updated with new versions, albeit previous versions will continue to be accessible.)
 * `2.3.3`

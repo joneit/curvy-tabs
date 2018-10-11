@@ -227,7 +227,7 @@ CurvyTabs.prototype = {
     toggle: function(idxOrNamOrEl, visibility) {
         var tab = this.getTab(idxOrNamOrEl);
         if (visibility === undefined) {
-            visibility = window.getComputedStyle(tab).display === 'none';
+            visibility = !this.visible(tab);
         }
         if (!visibility && tab === this.selected) {
             console.warn('Attempt to hide currently selected tab ignored.');
@@ -235,6 +235,17 @@ CurvyTabs.prototype = {
             tab.style.display = visibility ? 'block' : 'none';
             this.paint();
         }
+    },
+
+    visible: function(idxOrNamOrEl) {
+        var tab = this.getTab(idxOrNamOrEl);
+        return window.getComputedStyle(tab).display === 'block';
+    },
+
+    get visibleContentDivs() {
+        return this.contentDivs.filter(function(div) {
+            return this.visible(div);
+        }, this);
     },
 
     reset: function(save) {
@@ -265,11 +276,9 @@ CurvyTabs.prototype = {
         this.gc.clearRect(0, 0, this.canvas.width, this.size);
         this.gc.font = this.font;
 
-        var contents = this.contentDivs.filter(function(content) {
-            return window.getComputedStyle(content).display === 'block';
-        });
-        if (contents.length) {
-            contents.forEach(function(content) {
+        var visibleContentDivs = this.visibleContentDivs;
+        if (visibleContentDivs.length) {
+            visibleContentDivs.forEach(function(content) {
                 var props = this.tabs.get(content);
                 x += props.width = drawTab.call(this, content, props.left = x);
                 x -= (0.80 - this.curviness * 0.11) * this.size; // overlap tabs
@@ -392,7 +401,7 @@ function selectDiv() {
 }
 
 function clickHandler(event) {
-    this.contentDivs.find(function(content) {
+    this.visibleContentDivs.find(function(content) {
         var props = this.tabs.get(content);
         var margin = GAP + .25 * this.size;
         var left = props.left + margin;
@@ -424,6 +433,6 @@ function clickHandler(event) {
     }, this);
 }
 
-CurvyTabs.version = '2.3.6';
+CurvyTabs.version = '2.3.7';
 
 module.exports = CurvyTabs;

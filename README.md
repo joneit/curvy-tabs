@@ -274,6 +274,9 @@ The event will be propagated to the `tabBar.onclick` handler (if defined) unless
 * `curvy-tabs-pager` ([npm](https://npmjs.org/package/curvy-tabs-pager), [github](https://github.com/joneit/curvy-tabs-pager)) which implements paged content for curvy-tab bars.
 
 ## Version History
+* `2.3.8` (10/12/2018)
+   * Fix events to work as advertised
+   * Add `CustomEvent` polyfill for IE 11
 * `2.3.7` (10/11/2018)
    * Ignore hidden tabs in click handler
 * `2.3.6`

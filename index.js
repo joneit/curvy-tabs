@@ -41,6 +41,17 @@ var TRANSPARENT = 'rgba(0, 0, 0, 0)';
 var RATIO;
 
 function CurvyTabs(container, selectedContentElement) {
+    // IE 11 missing CustomEvent constructor
+    if ( typeof window.CustomEvent !== "function" ) {
+        window.CustomEvent = function(event, params) {
+            params = params || { bubbles: false, cancelable: false, detail: undefined };
+            var evt = document.createEvent('CustomEvent');
+            evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+            return evt;
+        };
+        window.CustomEvent.prototype = window.Event.prototype;
+    }
+
     injectStylesheet();
 
     var children = Array.prototype.slice.call(container.children);
@@ -206,7 +217,10 @@ CurvyTabs.prototype = {
     },
 
     select: function(idxOrNamOrEl) {
-        this.selected = this.getTab(idxOrNamOrEl);
+        var tab = this.getTab(idxOrNamOrEl);
+        if (dispatchEvents.call(this, tab)) {
+            this.selected = tab;
+        }
     },
 
     clear: function(idxOrNamOrEl) {
@@ -286,6 +300,17 @@ CurvyTabs.prototype = {
             drawTab.call(this, this.selected, this.tabs.get(this.selected).left, true);
             selectDiv.call(this);
         }
+    },
+
+    // forward 'onclick' handler access to container element as well as addEventListener calls
+    get onclick() {
+        return this.container.onclick;
+    },
+    set onclick(handler) {
+        this.container.onclick = handler;
+    },
+    addEventListener: function(type, handler) {
+        this.container.addEventListner(type, handler);
     }
 };
 
@@ -401,38 +426,37 @@ function selectDiv() {
 }
 
 function clickHandler(event) {
-    this.visibleContentDivs.find(function(content) {
-        var props = this.tabs.get(content);
+    this.visibleContentDivs.find(function(contentDiv) {
+        var props = this.tabs.get(contentDiv);
         var margin = GAP + .25 * this.size;
         var left = props.left + margin;
         if (event.offsetX > left && event.offsetX < left + props.width - margin - margin) {
-            var stopPropagation = false,
-                preventDefault = false,
-                tabEvent = {
-                    content: content,
-                    left: props.left,
-                    width: props.width,
-                    stopPropagation: function() { stopPropagation = true; },
-                    preventDefault: function() { preventDefault = true; }
-                };
-
-            if (typeof props.onclick === 'function') {
-                props.onclick.call(content, tabEvent);
-            }
-
-            if (!stopPropagation && typeof this.onclick === 'function') {
-                this.onclick(tabEvent);
-            }
-
-            if (!preventDefault) {
-                this.selected = content;
-            }
-
-            return true;
+            event.stopPropagation(); // we'll take it from here
+            this.select(contentDiv); // issues: event to tab content el + event to tab bar container el
+            return true; // found tab so quit loop
         }
     }, this);
 }
 
-CurvyTabs.version = '2.3.7';
+function dispatchEvents(contentDiv) {
+    var props = this.tabs.get(contentDiv);
+
+    // issue tab event
+    var tabEvent = new CustomEvent('click');
+    contentDiv.dispatchEvent(tabEvent);
+
+    var tabBarEvent = new CustomEvent('click', {
+        detail: {
+            content: contentDiv,
+            left: props.left,
+            width: props.width
+        }
+    });
+    this.container.dispatchEvent(tabBarEvent);
+
+    return !(tabEvent.defaultPrevented || tabBarEvent.defaultPrevented);
+}
+
+CurvyTabs.version = '2.3.8';
 
 module.exports = CurvyTabs;
